@@ -26,27 +26,27 @@ type IHttpRunner interface {
 }
 
 type JsonRequestData struct {
-	url     string
-	value   []byte
-	headers map[string]string
+	Url     string
+	Value   []byte
+	Headers map[string]string
 }
 
 type HtmlRequestData struct {
-	url     string
-	value   []byte
-	headers map[string]string
+	Url     string
+	Value   []byte
+	Headers map[string]string
 }
 
 type FormRequestData struct {
-	url     string
-	headers map[string]string
-	values  map[string]string
+	Url     string
+	Headers map[string]string
+	Values  map[string]string
 }
 
 type FileRequestData struct {
-	url      string
-	headers  map[string]string
-	filePath string
+	Url      string
+	Headers  map[string]string
+	FilePath string
 }
 
 type DirectHttpRunner struct {
@@ -101,14 +101,14 @@ func NewDirectHttpRunner(dialer *rule.Proxy) (IHttpRunner, error) {
 func (d *DirectHttpRunner) GetJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := d.client.R()
 
-	for key, value := range requestData.headers {
+	for key, value := range requestData.Headers {
 		request.Header.Add(key, value)
 	}
 
 	request.Header.Add("Content-Type", "application/json")
 
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.url)
+		parsedUrl, err := url.Parse(requestData.Url)
 		if err != nil {
 			return nil, err
 		}
@@ -124,7 +124,7 @@ func (d *DirectHttpRunner) GetJson(requestData JsonRequestData, cookieJar ...*ht
 		}
 	}
 
-	response, err := request.Get(requestData.url)
+	response, err := request.Get(requestData.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -135,12 +135,12 @@ func (d *DirectHttpRunner) GetJson(requestData JsonRequestData, cookieJar ...*ht
 func (d *DirectHttpRunner) GetHtml(requestData HtmlRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := d.client.R()
 
-	for key, value := range requestData.headers {
+	for key, value := range requestData.Headers {
 		request.Header.Add(key, value)
 	}
 
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.url)
+		parsedUrl, err := url.Parse(requestData.Url)
 		if err != nil {
 			return nil, err
 		}
@@ -156,7 +156,7 @@ func (d *DirectHttpRunner) GetHtml(requestData HtmlRequestData, cookieJar ...*ht
 		}
 	}
 
-	response, err := request.Get(requestData.url)
+	response, err := request.Get(requestData.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -165,14 +165,14 @@ func (d *DirectHttpRunner) GetHtml(requestData HtmlRequestData, cookieJar ...*ht
 }
 
 func (d *DirectHttpRunner) GetFile(requestData FileRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
-	request := d.client.R().SetOutput(requestData.filePath)
+	request := d.client.R().SetOutput(requestData.FilePath)
 
-	for key, value := range requestData.headers {
+	for key, value := range requestData.Headers {
 		request.Header.Add(key, value)
 	}
 
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.url)
+		parsedUrl, err := url.Parse(requestData.Url)
 		if err != nil {
 			return nil, err
 		}
@@ -188,7 +188,7 @@ func (d *DirectHttpRunner) GetFile(requestData FileRequestData, cookieJar ...*ht
 		}
 	}
 
-	response, err := request.Get(requestData.url)
+	response, err := request.Get(requestData.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -199,18 +199,18 @@ func (d *DirectHttpRunner) GetFile(requestData FileRequestData, cookieJar ...*ht
 func (d *DirectHttpRunner) PostJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := d.client.R()
 
-	if requestData.value != nil {
-		request.SetBody(requestData.value)
+	if requestData.Value != nil {
+		request.SetBody(requestData.Value)
 	}
 
-	for key, value := range requestData.headers {
+	for key, value := range requestData.Headers {
 		request.Header.Add(key, value)
 	}
 
 	request.Header.Add("Content-Type", "application/json")
 
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.url)
+		parsedUrl, err := url.Parse(requestData.Url)
 		if err != nil {
 			return nil, err
 		}
@@ -226,7 +226,7 @@ func (d *DirectHttpRunner) PostJson(requestData JsonRequestData, cookieJar ...*h
 		}
 	}
 
-	response, err := request.Post(requestData.url)
+	response, err := request.Post(requestData.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -237,17 +237,17 @@ func (d *DirectHttpRunner) PostJson(requestData JsonRequestData, cookieJar ...*h
 func (d *DirectHttpRunner) PutJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := d.client.R()
 
-	if requestData.value != nil {
-		request.SetBody(requestData.value)
+	if requestData.Value != nil {
+		request.SetBody(requestData.Value)
 	}
 
-	for key, value := range requestData.headers {
+	for key, value := range requestData.Headers {
 		request.Header.Add(key, value)
 	}
 
 	request.Header.Add("Content-Type", "application/json")
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.url)
+		parsedUrl, err := url.Parse(requestData.Url)
 		if err != nil {
 			return nil, err
 		}
@@ -263,7 +263,7 @@ func (d *DirectHttpRunner) PutJson(requestData JsonRequestData, cookieJar ...*ht
 		}
 	}
 
-	response, err := request.Put(requestData.url)
+	response, err := request.Put(requestData.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -274,17 +274,17 @@ func (d *DirectHttpRunner) PutJson(requestData JsonRequestData, cookieJar ...*ht
 func (d *DirectHttpRunner) PostForm(requestData FormRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := d.client.R()
 
-	if len(requestData.values) > 0 {
-		request.SetFormData(requestData.values)
+	if len(requestData.Values) > 0 {
+		request.SetFormData(requestData.Values)
 	}
 
-	for key, value := range requestData.headers {
+	for key, value := range requestData.Headers {
 		request.Header.Add(key, value)
 	}
 
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.url)
+		parsedUrl, err := url.Parse(requestData.Url)
 		if err != nil {
 			return nil, err
 		}
@@ -300,7 +300,7 @@ func (d *DirectHttpRunner) PostForm(requestData FormRequestData, cookieJar ...*h
 		}
 	}
 
-	response, err := request.Post(requestData.url)
+	response, err := request.Post(requestData.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -360,13 +360,13 @@ func NewProxyHttpRunner(dialer *rule.Proxy) (IHttpRunner, error) {
 func (p *ProxyHttpRunner) GetJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := p.client.R()
 
-	for key, value := range requestData.headers {
+	for key, value := range requestData.Headers {
 		request.Header.Add(key, value)
 	}
 
 	request.Header.Add("Content-Type", "application/json")
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.url)
+		parsedUrl, err := url.Parse(requestData.Url)
 		if err != nil {
 			return nil, err
 		}
@@ -382,7 +382,7 @@ func (p *ProxyHttpRunner) GetJson(requestData JsonRequestData, cookieJar ...*htt
 		}
 	}
 
-	response, err := request.Get(requestData.url)
+	response, err := request.Get(requestData.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -393,12 +393,12 @@ func (p *ProxyHttpRunner) GetJson(requestData JsonRequestData, cookieJar ...*htt
 func (p *ProxyHttpRunner) GetHtml(requestData HtmlRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := p.client.R()
 
-	for key, value := range requestData.headers {
+	for key, value := range requestData.Headers {
 		request.Header.Add(key, value)
 	}
 
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.url)
+		parsedUrl, err := url.Parse(requestData.Url)
 		if err != nil {
 			return nil, err
 		}
@@ -414,7 +414,7 @@ func (p *ProxyHttpRunner) GetHtml(requestData HtmlRequestData, cookieJar ...*htt
 		}
 	}
 
-	response, err := request.Get(requestData.url)
+	response, err := request.Get(requestData.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -423,14 +423,14 @@ func (p *ProxyHttpRunner) GetHtml(requestData HtmlRequestData, cookieJar ...*htt
 }
 
 func (p *ProxyHttpRunner) GetFile(requestData FileRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
-	request := p.client.R().SetOutput(requestData.filePath)
+	request := p.client.R().SetOutput(requestData.FilePath)
 
-	for key, value := range requestData.headers {
+	for key, value := range requestData.Headers {
 		request.Header.Add(key, value)
 	}
 
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.url)
+		parsedUrl, err := url.Parse(requestData.Url)
 		if err != nil {
 			return nil, err
 		}
@@ -446,7 +446,7 @@ func (p *ProxyHttpRunner) GetFile(requestData FileRequestData, cookieJar ...*htt
 		}
 	}
 
-	response, err := request.Get(requestData.url)
+	response, err := request.Get(requestData.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -457,17 +457,17 @@ func (p *ProxyHttpRunner) GetFile(requestData FileRequestData, cookieJar ...*htt
 func (p *ProxyHttpRunner) PostJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := p.client.R()
 
-	if requestData.value != nil {
-		request.SetBody(requestData.value)
+	if requestData.Value != nil {
+		request.SetBody(requestData.Value)
 	}
 
-	for key, value := range requestData.headers {
+	for key, value := range requestData.Headers {
 		request.Header.Add(key, value)
 	}
 
 	request.Header.Add("Content-Type", "application/json")
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.url)
+		parsedUrl, err := url.Parse(requestData.Url)
 		if err != nil {
 			return nil, err
 		}
@@ -483,7 +483,7 @@ func (p *ProxyHttpRunner) PostJson(requestData JsonRequestData, cookieJar ...*ht
 		}
 	}
 
-	response, err := request.Post(requestData.url)
+	response, err := request.Post(requestData.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -494,17 +494,17 @@ func (p *ProxyHttpRunner) PostJson(requestData JsonRequestData, cookieJar ...*ht
 func (p *ProxyHttpRunner) PutJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := p.client.R()
 
-	if requestData.value != nil {
-		request.SetBody(requestData.value)
+	if requestData.Value != nil {
+		request.SetBody(requestData.Value)
 	}
 
-	for key, value := range requestData.headers {
+	for key, value := range requestData.Headers {
 		request.Header.Add(key, value)
 	}
 
 	request.Header.Add("Content-Type", "application/json")
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.url)
+		parsedUrl, err := url.Parse(requestData.Url)
 		if err != nil {
 			return nil, err
 		}
@@ -520,7 +520,7 @@ func (p *ProxyHttpRunner) PutJson(requestData JsonRequestData, cookieJar ...*htt
 		}
 	}
 
-	response, err := request.Put(requestData.url)
+	response, err := request.Put(requestData.Url)
 	if err != nil {
 		return nil, err
 	}
@@ -531,17 +531,17 @@ func (p *ProxyHttpRunner) PutJson(requestData JsonRequestData, cookieJar ...*htt
 func (p *ProxyHttpRunner) PostForm(requestData FormRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := p.client.R()
 
-	if len(requestData.values) > 0 {
-		request.SetFormData(requestData.values)
+	if len(requestData.Values) > 0 {
+		request.SetFormData(requestData.Values)
 	}
 
-	for key, value := range requestData.headers {
+	for key, value := range requestData.Headers {
 		request.Header.Add(key, value)
 	}
 
 	request.Header.Add("Content-Type", "x-www-form-urlencoded")
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.url)
+		parsedUrl, err := url.Parse(requestData.Url)
 		if err != nil {
 			return nil, err
 		}
@@ -557,7 +557,7 @@ func (p *ProxyHttpRunner) PostForm(requestData FormRequestData, cookieJar ...*ht
 		}
 	}
 
-	response, err := request.Post(requestData.url)
+	response, err := request.Post(requestData.Url)
 	if err != nil {
 		return nil, err
 	}
