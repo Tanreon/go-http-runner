@@ -17,12 +17,12 @@ import (
 )
 
 type IHttpRunner interface {
-	getJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
-	getHtml(requestData HtmlRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
-	getFile(requestData FileRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
-	postJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
-	putJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
-	postForm(requestData FormRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
+	GetJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
+	GetHtml(requestData HtmlRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
+	GetFile(requestData FileRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
+	PostJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
+	PutJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
+	PostForm(requestData FormRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
 }
 
 type JsonRequestData struct {
@@ -98,7 +98,7 @@ func NewDirectHttpRunner(dialer *rule.Proxy) (IHttpRunner, error) {
 	return &DirectHttpRunner{client}, nil
 }
 
-func (d *DirectHttpRunner) getJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
+func (d *DirectHttpRunner) GetJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := d.client.R()
 
 	for key, value := range requestData.headers {
@@ -132,7 +132,7 @@ func (d *DirectHttpRunner) getJson(requestData JsonRequestData, cookieJar ...*ht
 	return response, nil
 }
 
-func (d *DirectHttpRunner) getHtml(requestData HtmlRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
+func (d *DirectHttpRunner) GetHtml(requestData HtmlRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := d.client.R()
 
 	for key, value := range requestData.headers {
@@ -164,7 +164,7 @@ func (d *DirectHttpRunner) getHtml(requestData HtmlRequestData, cookieJar ...*ht
 	return response, nil
 }
 
-func (d *DirectHttpRunner) getFile(requestData FileRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
+func (d *DirectHttpRunner) GetFile(requestData FileRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := d.client.R().SetOutput(requestData.filePath)
 
 	for key, value := range requestData.headers {
@@ -196,7 +196,7 @@ func (d *DirectHttpRunner) getFile(requestData FileRequestData, cookieJar ...*ht
 	return response, nil
 }
 
-func (d *DirectHttpRunner) postJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
+func (d *DirectHttpRunner) PostJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := d.client.R()
 
 	if requestData.value != nil {
@@ -234,7 +234,7 @@ func (d *DirectHttpRunner) postJson(requestData JsonRequestData, cookieJar ...*h
 	return response, nil
 }
 
-func (d *DirectHttpRunner) putJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
+func (d *DirectHttpRunner) PutJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := d.client.R()
 
 	if requestData.value != nil {
@@ -271,7 +271,7 @@ func (d *DirectHttpRunner) putJson(requestData JsonRequestData, cookieJar ...*ht
 	return response, nil
 }
 
-func (d *DirectHttpRunner) postForm(requestData FormRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
+func (d *DirectHttpRunner) PostForm(requestData FormRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := d.client.R()
 
 	if len(requestData.values) > 0 {
@@ -357,7 +357,7 @@ func NewProxyHttpRunner(dialer *rule.Proxy) (IHttpRunner, error) {
 	return &ProxyHttpRunner{client}, nil
 }
 
-func (p *ProxyHttpRunner) getJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
+func (p *ProxyHttpRunner) GetJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := p.client.R()
 
 	for key, value := range requestData.headers {
@@ -390,7 +390,7 @@ func (p *ProxyHttpRunner) getJson(requestData JsonRequestData, cookieJar ...*htt
 	return response, nil
 }
 
-func (p *ProxyHttpRunner) getHtml(requestData HtmlRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
+func (p *ProxyHttpRunner) GetHtml(requestData HtmlRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := p.client.R()
 
 	for key, value := range requestData.headers {
@@ -422,7 +422,7 @@ func (p *ProxyHttpRunner) getHtml(requestData HtmlRequestData, cookieJar ...*htt
 	return response, nil
 }
 
-func (p *ProxyHttpRunner) getFile(requestData FileRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
+func (p *ProxyHttpRunner) GetFile(requestData FileRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := p.client.R().SetOutput(requestData.filePath)
 
 	for key, value := range requestData.headers {
@@ -454,7 +454,7 @@ func (p *ProxyHttpRunner) getFile(requestData FileRequestData, cookieJar ...*htt
 	return response, nil
 }
 
-func (p *ProxyHttpRunner) postJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
+func (p *ProxyHttpRunner) PostJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := p.client.R()
 
 	if requestData.value != nil {
@@ -491,7 +491,7 @@ func (p *ProxyHttpRunner) postJson(requestData JsonRequestData, cookieJar ...*ht
 	return response, nil
 }
 
-func (p *ProxyHttpRunner) putJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
+func (p *ProxyHttpRunner) PutJson(requestData JsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := p.client.R()
 
 	if requestData.value != nil {
@@ -528,7 +528,7 @@ func (p *ProxyHttpRunner) putJson(requestData JsonRequestData, cookieJar ...*htt
 	return response, nil
 }
 
-func (p *ProxyHttpRunner) postForm(requestData FormRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
+func (p *ProxyHttpRunner) PostForm(requestData FormRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
 	request := p.client.R()
 
 	if len(requestData.values) > 0 {
