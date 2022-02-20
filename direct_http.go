@@ -69,7 +69,7 @@ func NewAdvancedDirectHttpRunner(dialer *rule.Proxy, retryCount int, timeout tim
 }
 
 func NewDirectHttpRunner(dialer *rule.Proxy) (IHttpRunner, error) {
-	return NewAdvancedProxyHttpRunner(dialer, 2, time.Second*15, defaultHeaders)
+	return NewAdvancedDirectHttpRunner(dialer, 2, time.Second*15, defaultHeaders)
 }
 
 func (d *DirectHttpRunner) GetJson(requestData IJsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {

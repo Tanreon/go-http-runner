@@ -228,7 +228,7 @@ func (p *ProxyHttpRunner) PostJson(requestData IJsonRequestData, cookieJar ...*h
 	request := p.client.R()
 
 	if requestData.IsValueSet() {
-		request.SetBody(requestData.Value)
+		request.SetBody(requestData.Value())
 	}
 
 	if requestData.IsHeadersSet() {
@@ -281,7 +281,7 @@ func (p *ProxyHttpRunner) PutJson(requestData IJsonRequestData, cookieJar ...*ht
 	request := p.client.R()
 
 	if requestData.IsValueSet() {
-		request.SetBody(requestData.Value)
+		request.SetBody(requestData.Value())
 	}
 
 	if requestData.IsHeadersSet() {

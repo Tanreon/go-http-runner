@@ -8,8 +8,8 @@ import (
 	NetworkRunner "github.com/Tanreon/go-network-runner"
 )
 
-func TestDirectHttp(t *testing.T) {
-	t.Run("TestDirectHttp", func(t *testing.T) {
+func TestDirectHttpGetJson(t *testing.T) {
+	t.Run("TestDirectHttpGetJson", func(t *testing.T) {
 		dialOptions := NetworkRunner.DialOptions{
 			DialTimeout:  120,
 			RelayTimeout: 60,
@@ -28,12 +28,45 @@ func TestDirectHttp(t *testing.T) {
 		jsonRequestData.SetHeaders(map[string]string{
 			"x-test": "true",
 		})
-		jsonRequestData.SetValue([]byte("test"))
 		jsonRequestData.SetRetryOption(3)
 		jsonRequestData.SetTimeoutOption(time.Second * 60)
 		jsonRequestData.SetFollowRedirectOption(true)
 
 		response, err := directHttpRunner.GetJson(jsonRequestData)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got := response.StatusCode(); got != 200 {
+			t.Fatalf("response.StatusCode() = %v, want 200", got)
+		}
+	})
+}
+func TestDirectHttpPostJson(t *testing.T) {
+	t.Run("TestDirectHttpPostJson", func(t *testing.T) {
+		dialOptions := NetworkRunner.DialOptions{
+			DialTimeout:  120,
+			RelayTimeout: 60,
+		}
+		directDialer, err := NetworkRunner.NewDirectDialer(dialOptions)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		directHttpRunner, err := NewDirectHttpRunner(directDialer)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		jsonRequestData := NewJsonRequestData("https://httpbin.org/post")
+		jsonRequestData.SetHeaders(map[string]string{
+			"x-test": "true",
+		})
+		jsonRequestData.SetValue([]byte("test"))
+		jsonRequestData.SetRetryOption(3)
+		jsonRequestData.SetTimeoutOption(time.Second * 60)
+		jsonRequestData.SetFollowRedirectOption(true)
+
+		response, err := directHttpRunner.PostJson(jsonRequestData)
 		if err != nil {
 			t.Fatal(err)
 		}
