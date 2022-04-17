@@ -5,13 +5,10 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"net/url"
-	"strings"
 	"time"
 
 	"github.com/go-resty/resty/v2"
 	"github.com/nadoo/glider/rule"
-	"github.com/weppos/publicsuffix-go/publicsuffix"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -69,7 +66,7 @@ func NewAdvancedDirectHttpRunner(dialer *rule.Proxy, retryCount int, timeout tim
 }
 
 func NewDirectHttpRunner(dialer *rule.Proxy) (IHttpRunner, error) {
-	return NewAdvancedDirectHttpRunner(dialer, 2, time.Second*15, defaultHeaders)
+	return NewAdvancedDirectHttpRunner(dialer, 2, time.Second*15, DefaultHeaders)
 }
 
 func (d *DirectHttpRunner) GetJson(requestData IJsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
@@ -103,19 +100,8 @@ func (d *DirectHttpRunner) GetJson(requestData IJsonRequestData, cookieJar ...*h
 	request.Header.Add("Content-Type", "application/json")
 
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.Url())
-		if err != nil {
+		if err := integrateCookies(requestData, request, cookieJar); err != nil {
 			return nil, err
-		}
-		domain, err := publicsuffix.Domain(parsedUrl.Host)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, cookie := range cookieJar {
-			if strings.HasSuffix(cookie.Domain, domain) {
-				request.SetCookies([]*http.Cookie{cookie})
-			}
 		}
 	}
 
@@ -147,19 +133,8 @@ func (d *DirectHttpRunner) GetHtml(requestData IHtmlRequestData, cookieJar ...*h
 	}
 
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.Url())
-		if err != nil {
+		if err := integrateCookies(requestData, request, cookieJar); err != nil {
 			return nil, err
-		}
-		domain, err := publicsuffix.Domain(parsedUrl.Host)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, cookie := range cookieJar {
-			if strings.HasSuffix(cookie.Domain, domain) {
-				request.SetCookies([]*http.Cookie{cookie})
-			}
 		}
 	}
 
@@ -191,19 +166,8 @@ func (d *DirectHttpRunner) GetFile(requestData IFileRequestData, cookieJar ...*h
 	}
 
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.Url())
-		if err != nil {
+		if err := integrateCookies(requestData, request, cookieJar); err != nil {
 			return nil, err
-		}
-		domain, err := publicsuffix.Domain(parsedUrl.Host)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, cookie := range cookieJar {
-			if strings.HasSuffix(cookie.Domain, domain) {
-				request.SetCookies([]*http.Cookie{cookie})
-			}
 		}
 	}
 
@@ -245,19 +209,8 @@ func (d *DirectHttpRunner) PostJson(requestData IJsonRequestData, cookieJar ...*
 	request.Header.Add("Content-Type", "application/json")
 
 	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.Url())
-		if err != nil {
+		if err := integrateCookies(requestData, request, cookieJar); err != nil {
 			return nil, err
-		}
-		domain, err := publicsuffix.Domain(parsedUrl.Host)
-		if err != nil {
-			return nil, err
-		}
-
-		for _, cookie := range cookieJar {
-			if strings.HasSuffix(cookie.Domain, domain) {
-				request.SetCookies([]*http.Cookie{cookie})
-			}
 		}
 	}
 
@@ -297,20 +250,10 @@ func (d *DirectHttpRunner) PutJson(requestData IJsonRequestData, cookieJar ...*h
 	}
 
 	request.Header.Add("Content-Type", "application/json")
-	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.Url())
-		if err != nil {
-			return nil, err
-		}
-		domain, err := publicsuffix.Domain(parsedUrl.Host)
-		if err != nil {
-			return nil, err
-		}
 
-		for _, cookie := range cookieJar {
-			if strings.HasSuffix(cookie.Domain, domain) {
-				request.SetCookies([]*http.Cookie{cookie})
-			}
+	if len(cookieJar) > 0 {
+		if err := integrateCookies(requestData, request, cookieJar); err != nil {
+			return nil, err
 		}
 	}
 
@@ -346,20 +289,10 @@ func (d *DirectHttpRunner) PostForm(requestData IFormRequestData, cookieJar ...*
 	}
 
 	request.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	if len(cookieJar) > 0 {
-		parsedUrl, err := url.Parse(requestData.Url())
-		if err != nil {
-			return nil, err
-		}
-		domain, err := publicsuffix.Domain(parsedUrl.Host)
-		if err != nil {
-			return nil, err
-		}
 
-		for _, cookie := range cookieJar {
-			if strings.HasSuffix(cookie.Domain, domain) {
-				request.SetCookies([]*http.Cookie{cookie})
-			}
+	if len(cookieJar) > 0 {
+		if err := integrateCookies(requestData, request, cookieJar); err != nil {
+			return nil, err
 		}
 	}
 

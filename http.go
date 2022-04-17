@@ -2,12 +2,14 @@ package http_runner
 
 import (
 	"net/http"
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/go-resty/resty/v2"
 )
 
-var defaultHeaders = map[string]string{
+var DefaultHeaders = map[string]string{
 	"accept":          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
 	"accept-language": "en-US,en;q=0.9",
 	"cache-control":   "max-age=0",
@@ -340,4 +342,28 @@ func (j *FileRequestData) FollowRedirectOption() bool {
 
 func NewFileRequestData(url, filePath string) IFileRequestData {
 	return &FileRequestData{url: url, filePath: filePath}
+}
+
+func integrateCookies(requestData IBaseRequest, request *resty.Request, cookieJar []*http.Cookie) error {
+	parsedUrl, err := url.Parse(requestData.Url())
+	if err != nil {
+		return err
+	}
+
+	cookieJarMap := make(map[string]*http.Cookie)
+
+	for _, cookie := range cookieJar {
+		if strings.HasSuffix(parsedUrl.Host, strings.TrimPrefix(cookie.Domain, ".")) {
+			cookieComplexKey := cookie.Domain + cookie.Name + cookie.Path
+			if _, present := cookieJarMap[cookieComplexKey]; !present {
+				cookieJarMap[cookieComplexKey] = cookie
+			}
+		}
+	}
+
+	for _, cookie := range cookieJarMap {
+		request.SetCookie(cookie)
+	}
+
+	return err
 }

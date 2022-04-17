@@ -10,11 +10,10 @@ import (
 
 func TestDirectHttpGetJson(t *testing.T) {
 	t.Run("TestDirectHttpGetJson", func(t *testing.T) {
-		dialOptions := NetworkRunner.DialOptions{
-			DialTimeout:  120,
-			RelayTimeout: 60,
-		}
-		directDialer, err := NetworkRunner.NewDirectDialer(dialOptions)
+		directDialOptions := NetworkRunner.NewDirectDialOptions()
+		directDialOptions.SetDialTimeout(60)
+		directDialOptions.SetRelayTimeout(60)
+		directDialer, err := NetworkRunner.NewDirectDialer(directDialOptions)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -43,11 +42,10 @@ func TestDirectHttpGetJson(t *testing.T) {
 }
 func TestDirectHttpPostJson(t *testing.T) {
 	t.Run("TestDirectHttpPostJson", func(t *testing.T) {
-		dialOptions := NetworkRunner.DialOptions{
-			DialTimeout:  120,
-			RelayTimeout: 60,
-		}
-		directDialer, err := NetworkRunner.NewDirectDialer(dialOptions)
+		directDialOptions := NetworkRunner.NewDirectDialOptions()
+		directDialOptions.SetDialTimeout(60)
+		directDialOptions.SetRelayTimeout(60)
+		directDialer, err := NetworkRunner.NewDirectDialer(directDialOptions)
 		if err != nil {
 			t.Fatal(err)
 		}
