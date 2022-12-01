@@ -1,9 +1,11 @@
 package http_runner
 
 import (
+	"bufio"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 
@@ -204,6 +206,13 @@ func NewHtmlRequestOptions(url string) IHtmlRequestOptions {
 type FileInfo struct {
 	fileName string
 	reader   io.Reader
+}
+
+func newFileInfo(file *os.File) FileInfo {
+	return FileInfo{
+		fileName: file.Name(),
+		reader:   bufio.NewReader(file),
+	}
 }
 
 type IFormRequestOptions interface {

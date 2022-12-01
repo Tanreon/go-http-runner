@@ -1,7 +1,6 @@
 package http_runner
 
 import (
-	"bufio"
 	"os"
 	"reflect"
 	"testing"
@@ -177,10 +176,7 @@ func TestDirectHttpPostFiles(t *testing.T) {
 		defer txtFile.Close()
 
 		files := map[string]FileInfo{
-			"upload_files": {
-				fileName: txtFile.Name(),
-				reader:   bufio.NewReader(txtFile),
-			},
+			"upload_files": newFileInfo(txtFile),
 		}
 
 		formRequest := NewFormRequestOptions("https://httpbin.org/post")
