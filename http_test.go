@@ -176,7 +176,7 @@ func TestDirectHttpPostFiles(t *testing.T) {
 		defer txtFile.Close()
 
 		files := map[string]FileInfo{
-			"upload_files": newFileInfo(txtFile),
+			"upload_files": BuildFileInfo(txtFile),
 		}
 
 		formRequest := NewFormRequestOptions("https://httpbin.org/post")

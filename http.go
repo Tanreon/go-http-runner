@@ -208,7 +208,7 @@ type FileInfo struct {
 	reader   io.Reader
 }
 
-func newFileInfo(file *os.File) FileInfo {
+func BuildFileInfo(file *os.File) FileInfo {
 	return FileInfo{
 		fileName: file.Name(),
 		reader:   bufio.NewReader(file),
