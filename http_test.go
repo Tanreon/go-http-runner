@@ -1,6 +1,8 @@
 package http_runner
 
 import (
+	"bufio"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -23,15 +25,15 @@ func TestDirectHttpGetJson(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		jsonRequestData := NewJsonRequestData("https://httpbin.org/get")
-		jsonRequestData.SetHeaders(map[string]string{
+		jsonRequest := NewJsonRequestOptions("https://httpbin.org/get")
+		jsonRequest.SetHeaders(map[string]string{
 			"x-test": "true",
 		})
-		jsonRequestData.SetRetryOption(3)
-		jsonRequestData.SetTimeoutOption(time.Second * 60)
-		jsonRequestData.SetFollowRedirectOption(true)
+		jsonRequest.SetRetryOption(3)
+		jsonRequest.SetTimeoutOption(time.Second * 60)
+		jsonRequest.SetFollowRedirectOption(true)
 
-		response, err := directHttpRunner.GetJson(jsonRequestData)
+		response, err := directHttpRunner.GetJson(jsonRequest)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -55,16 +57,16 @@ func TestDirectHttpPostJson(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		jsonRequestData := NewJsonRequestData("https://httpbin.org/post")
-		jsonRequestData.SetHeaders(map[string]string{
+		jsonRequest := NewJsonRequestOptions("https://httpbin.org/post")
+		jsonRequest.SetHeaders(map[string]string{
 			"x-test": "true",
 		})
-		jsonRequestData.SetValue([]byte("test"))
-		jsonRequestData.SetRetryOption(3)
-		jsonRequestData.SetTimeoutOption(time.Second * 60)
-		jsonRequestData.SetFollowRedirectOption(true)
+		jsonRequest.SetValue([]byte("test"))
+		jsonRequest.SetRetryOption(3)
+		jsonRequest.SetTimeoutOption(time.Second * 60)
+		jsonRequest.SetFollowRedirectOption(true)
 
-		response, err := directHttpRunner.PostJson(jsonRequestData)
+		response, err := directHttpRunner.PostJson(jsonRequest)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -74,81 +76,122 @@ func TestDirectHttpPostJson(t *testing.T) {
 	})
 }
 
-func TestJsonRequestData(t *testing.T) {
-	t.Run("TestJsonRequestData-Url", func(t *testing.T) {
+func TestJsonRequestOptions(t *testing.T) {
+	t.Run("TestJsonRequest-Url", func(t *testing.T) {
 		want := "https://httpbin.org/get"
 
-		jsonRequestData := NewJsonRequestData(want)
+		jsonRequest := NewJsonRequestOptions(want)
 
-		if got := jsonRequestData.Url(); got != want {
-			t.Errorf("jsonRequestData.Url() = %v, want %v", got, want)
+		if got := jsonRequest.Url(); got != want {
+			t.Errorf("jsonRequest.Url() = %v, want %v", got, want)
 		}
 	})
-	t.Run("TestJsonRequestData-Value", func(t *testing.T) {
+	t.Run("TestJsonRequest-Value", func(t *testing.T) {
 		want := []byte("value")
 
-		jsonRequestData := NewJsonRequestData("https://httpbin.org/get")
-		jsonRequestData.SetValue(want)
+		jsonRequest := NewJsonRequestOptions("https://httpbin.org/get")
+		jsonRequest.SetValue(want)
 
-		if got := jsonRequestData.IsValueSet(); got != true {
-			t.Errorf("jsonRequestData.IsValueSet() = %v, want %v", got, true)
+		if got := jsonRequest.IsValueSet(); got != true {
+			t.Errorf("jsonRequest.IsValueSet() = %v, want %v", got, true)
 		}
-		if got := jsonRequestData.Value(); !reflect.DeepEqual(got, want) {
-			t.Errorf("jsonRequestData.Value() = %v, want %v", got, want)
+		if got := jsonRequest.Value(); !reflect.DeepEqual(got, want) {
+			t.Errorf("jsonRequest.Value() = %v, want %v", got, want)
 		}
 	})
-	t.Run("TestJsonRequestData-Headers", func(t *testing.T) {
+	t.Run("TestJsonRequest-Headers", func(t *testing.T) {
 		want := map[string]string{
 			"x-test-header": "test",
 		}
 
-		jsonRequestData := NewJsonRequestData("https://httpbin.org/get")
-		jsonRequestData.SetHeaders(want)
+		jsonRequest := NewJsonRequestOptions("https://httpbin.org/get")
+		jsonRequest.SetHeaders(want)
 
-		if got := jsonRequestData.IsHeadersSet(); got != true {
-			t.Errorf("jsonRequestData.IsHeadersSet() = %v, want %v", got, true)
+		if got := jsonRequest.IsHeadersSet(); got != true {
+			t.Errorf("jsonRequest.IsHeadersSet() = %v, want %v", got, true)
 		}
-		if got := jsonRequestData.Headers(); !reflect.DeepEqual(got, want) {
-			t.Errorf("jsonRequestData.Headers() = %v, want %v", got, want)
+		if got := jsonRequest.Headers(); !reflect.DeepEqual(got, want) {
+			t.Errorf("jsonRequest.Headers() = %v, want %v", got, want)
 		}
 	})
-	t.Run("TestJsonRequestData-RetryOption", func(t *testing.T) {
+	t.Run("TestJsonRequest-RetryOption", func(t *testing.T) {
 		want := 3
 
-		jsonRequestData := NewJsonRequestData("https://httpbin.org/get")
-		jsonRequestData.SetRetryOption(want)
+		jsonRequest := NewJsonRequestOptions("https://httpbin.org/get")
+		jsonRequest.SetRetryOption(want)
 
-		if got := jsonRequestData.IsRetryOptionSet(); got != true {
-			t.Errorf("jsonRequestData.IsRetryOptionSet() = %v, want %v", got, true)
+		if got := jsonRequest.IsRetryOptionSet(); got != true {
+			t.Errorf("jsonRequest.IsRetryOptionSet() = %v, want %v", got, true)
 		}
-		if got := jsonRequestData.RetryOption(); got != want {
-			t.Errorf("jsonRequestData.RetryOption() = %v, want %v", got, want)
+		if got := jsonRequest.RetryOption(); got != want {
+			t.Errorf("jsonRequest.RetryOption() = %v, want %v", got, want)
 		}
 	})
-	t.Run("TestJsonRequestData-FollowRedirectOption", func(t *testing.T) {
+	t.Run("TestJsonRequestOptions-FollowRedirectOption", func(t *testing.T) {
 		want := true
 
-		jsonRequestData := NewJsonRequestData("https://httpbin.org/get")
-		jsonRequestData.SetFollowRedirectOption(want)
+		jsonRequest := NewJsonRequestOptions("https://httpbin.org/get")
+		jsonRequest.SetFollowRedirectOption(want)
 
-		if got := jsonRequestData.IsFollowRedirectOptionSet(); got != true {
-			t.Errorf("jsonRequestData.IsFollowRedirectOptionSet() = %v, want %v", got, true)
+		if got := jsonRequest.IsFollowRedirectOptionSet(); got != true {
+			t.Errorf("jsonRequest.IsFollowRedirectOptionSet() = %v, want %v", got, true)
 		}
-		if got := jsonRequestData.FollowRedirectOption(); got != want {
-			t.Errorf("jsonRequestData.FollowRedirectOption() = %v, want %v", got, want)
+		if got := jsonRequest.FollowRedirectOption(); got != want {
+			t.Errorf("jsonRequest.FollowRedirectOption() = %v, want %v", got, want)
 		}
 	})
-	t.Run("TestJsonRequestData-TimeoutOption", func(t *testing.T) {
+	t.Run("TestJsonRequestOptions-TimeoutOption", func(t *testing.T) {
 		want := time.Second * 5
 
-		jsonRequestData := NewJsonRequestData("https://httpbin.org/get")
-		jsonRequestData.SetTimeoutOption(want)
+		jsonRequest := NewJsonRequestOptions("https://httpbin.org/get")
+		jsonRequest.SetTimeoutOption(want)
 
-		if got := jsonRequestData.IsTimeoutOptionSet(); got != true {
-			t.Errorf("jsonRequestData.IsTimeoutOptionSet() = %v, want %v", got, true)
+		if got := jsonRequest.IsTimeoutOptionSet(); got != true {
+			t.Errorf("jsonRequest.IsTimeoutOptionSet() = %v, want %v", got, true)
 		}
-		if got := jsonRequestData.TimeoutOption(); got != want {
-			t.Errorf("jsonRequestData.TimeoutOption() = %v, want %v", got, want)
+		if got := jsonRequest.TimeoutOption(); got != want {
+			t.Errorf("jsonRequest.TimeoutOption() = %v, want %v", got, want)
+		}
+	})
+}
+
+func TestDirectHttpPostFiles(t *testing.T) {
+	t.Run("TestDirectHttpPostFiles", func(t *testing.T) {
+		directDialOptions := NetworkRunner.NewDirectDialOptions()
+		directDialOptions.SetDialTimeout(60)
+		directDialOptions.SetRelayTimeout(60)
+		directDialer, err := NetworkRunner.NewDirectDialer(directDialOptions)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		directHttpRunner, err := NewDirectHttpRunner(directDialer)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		txtFile, err := os.Open("file_test.bin")
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer txtFile.Close()
+
+		files := map[string]FileInfo{
+			"upload_files": {
+				fileName: txtFile.Name(),
+				reader:   bufio.NewReader(txtFile),
+			},
+		}
+
+		formRequest := NewFormRequestOptions("https://httpbin.org/post")
+		formRequest.SetFiles(files)
+
+		response, err := directHttpRunner.PostForm(formRequest)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got := response.StatusCode(); got != 200 {
+			t.Fatalf("response.StatusCode() = %v, want 200", got)
 		}
 	})
 }

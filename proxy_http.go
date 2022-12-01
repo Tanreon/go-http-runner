@@ -65,9 +65,9 @@ func NewProxyHttpRunner(dialer *rule.Proxy) (IHttpRunner, error) {
 	return NewAdvancedProxyHttpRunner(dialer, 3, time.Second*30, DefaultHeaders)
 }
 
-func (p *ProxyHttpRunner) GetJson(requestData IJsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
-	if requestData.IsFollowRedirectOptionSet() {
-		if !requestData.FollowRedirectOption() {
+func (p *ProxyHttpRunner) GetJson(requestOptions IJsonRequestOptions, cookieJar ...*http.Cookie) (*resty.Response, error) {
+	if requestOptions.IsFollowRedirectOptionSet() {
+		if !requestOptions.FollowRedirectOption() {
 			p.client.SetRedirectPolicy(resty.RedirectPolicyFunc(func(req *http.Request, via []*http.Request) error { // disable redirect
 				return http.ErrUseLastResponse
 			}))
@@ -78,17 +78,17 @@ func (p *ProxyHttpRunner) GetJson(requestData IJsonRequestData, cookieJar ...*ht
 		}))
 	}
 
-	if requestData.IsRetryOptionSet() {
-		p.client.SetRetryCount(requestData.RetryOption())
+	if requestOptions.IsRetryOptionSet() {
+		p.client.SetRetryCount(requestOptions.RetryOption())
 	}
-	if requestData.IsTimeoutOptionSet() {
-		p.client.SetTimeout(requestData.TimeoutOption())
+	if requestOptions.IsTimeoutOptionSet() {
+		p.client.SetTimeout(requestOptions.TimeoutOption())
 	}
 
 	request := p.client.R()
 
-	if requestData.IsHeadersSet() {
-		for key, value := range requestData.Headers() {
+	if requestOptions.IsHeadersSet() {
+		for key, value := range requestOptions.Headers() {
 			request.Header.Add(key, value)
 		}
 	}
@@ -96,83 +96,83 @@ func (p *ProxyHttpRunner) GetJson(requestData IJsonRequestData, cookieJar ...*ht
 	request.Header.Add("Content-Type", "application/json")
 
 	if len(cookieJar) > 0 {
-		if err := integrateCookies(requestData, request, cookieJar); err != nil {
+		if err := integrateCookies(requestOptions, request, cookieJar); err != nil {
 			return nil, err
 		}
 	}
 
-	return request.Get(requestData.Url())
+	return request.Get(requestOptions.Url())
 }
 
-func (p *ProxyHttpRunner) GetHtml(requestData IHtmlRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
-	if requestData.IsFollowRedirectOptionSet() {
-		if !requestData.FollowRedirectOption() {
+func (p *ProxyHttpRunner) GetHtml(requestOptions IHtmlRequestOptions, cookieJar ...*http.Cookie) (*resty.Response, error) {
+	if requestOptions.IsFollowRedirectOptionSet() {
+		if !requestOptions.FollowRedirectOption() {
 			p.client.SetRedirectPolicy(resty.RedirectPolicyFunc(func(req *http.Request, via []*http.Request) error { // disable redirect
 				return http.ErrUseLastResponse
 			}))
 		}
 	}
 
-	if requestData.IsRetryOptionSet() {
-		p.client.SetRetryCount(requestData.RetryOption())
+	if requestOptions.IsRetryOptionSet() {
+		p.client.SetRetryCount(requestOptions.RetryOption())
 	}
-	if requestData.IsTimeoutOptionSet() {
-		p.client.SetTimeout(requestData.TimeoutOption())
+	if requestOptions.IsTimeoutOptionSet() {
+		p.client.SetTimeout(requestOptions.TimeoutOption())
 	}
 
 	request := p.client.R()
 
-	if requestData.IsHeadersSet() {
-		for key, value := range requestData.Headers() {
+	if requestOptions.IsHeadersSet() {
+		for key, value := range requestOptions.Headers() {
 			request.Header.Add(key, value)
 		}
 	}
 
 	if len(cookieJar) > 0 {
-		if err := integrateCookies(requestData, request, cookieJar); err != nil {
+		if err := integrateCookies(requestOptions, request, cookieJar); err != nil {
 			return nil, err
 		}
 	}
 
-	return request.Get(requestData.Url())
+	return request.Get(requestOptions.Url())
 }
 
-func (p *ProxyHttpRunner) GetFile(requestData IFileRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
-	if requestData.IsFollowRedirectOptionSet() {
-		if !requestData.FollowRedirectOption() {
+func (p *ProxyHttpRunner) GetFile(requestOptions IFileRequestOptions, cookieJar ...*http.Cookie) (*resty.Response, error) {
+	if requestOptions.IsFollowRedirectOptionSet() {
+		if !requestOptions.FollowRedirectOption() {
 			p.client.SetRedirectPolicy(resty.RedirectPolicyFunc(func(req *http.Request, via []*http.Request) error { // disable redirect
 				return http.ErrUseLastResponse
 			}))
 		}
 	}
 
-	if requestData.IsRetryOptionSet() {
-		p.client.SetRetryCount(requestData.RetryOption())
+	if requestOptions.IsRetryOptionSet() {
+		p.client.SetRetryCount(requestOptions.RetryOption())
 	}
-	if requestData.IsTimeoutOptionSet() {
-		p.client.SetTimeout(requestData.TimeoutOption())
+	if requestOptions.IsTimeoutOptionSet() {
+		p.client.SetTimeout(requestOptions.TimeoutOption())
 	}
 
-	request := p.client.R().SetOutput(requestData.FilePath())
+	request := p.client.R().SetOutput(requestOptions.FilePath())
 
-	if requestData.IsHeadersSet() {
-		for key, value := range requestData.Headers() {
+	if requestOptions.IsHeadersSet() {
+		for key, value := range requestOptions.Headers() {
 			request.Header.Add(key, value)
 		}
 	}
 
 	if len(cookieJar) > 0 {
-		if err := integrateCookies(requestData, request, cookieJar); err != nil {
+		if err := integrateCookies(requestOptions, request, cookieJar); err != nil {
 			return nil, err
 		}
 	}
 
-	return request.Get(requestData.Url())
+	return request.Get(requestOptions.Url())
 }
 
-func (p *ProxyHttpRunner) PostJson(requestData IJsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
-	if requestData.IsFollowRedirectOptionSet() {
-		if !requestData.FollowRedirectOption() {
+func (p *ProxyHttpRunner) PostJson(requestOptions IJsonRequestOptions, cookieJar ...*http.Cookie) (*resty.Response, error) {
+	if requestOptions.IsFollowRedirectOptionSet() {
+		if !requestOptions.FollowRedirectOption() {
 			p.client.SetRedirectPolicy(resty.RedirectPolicyFunc(func(req *http.Request, via []*http.Request) error { // disable redirect
 				return http.ErrUseLastResponse
 			}))
@@ -183,21 +183,21 @@ func (p *ProxyHttpRunner) PostJson(requestData IJsonRequestData, cookieJar ...*h
 		}))
 	}
 
-	if requestData.IsRetryOptionSet() {
-		p.client.SetRetryCount(requestData.RetryOption())
+	if requestOptions.IsRetryOptionSet() {
+		p.client.SetRetryCount(requestOptions.RetryOption())
 	}
-	if requestData.IsTimeoutOptionSet() {
-		p.client.SetTimeout(requestData.TimeoutOption())
+	if requestOptions.IsTimeoutOptionSet() {
+		p.client.SetTimeout(requestOptions.TimeoutOption())
 	}
 
 	request := p.client.R()
 
-	if requestData.IsValueSet() {
-		request.SetBody(requestData.Value())
+	if requestOptions.IsValueSet() {
+		request.SetBody(requestOptions.Value())
 	}
 
-	if requestData.IsHeadersSet() {
-		for key, value := range requestData.Headers() {
+	if requestOptions.IsHeadersSet() {
+		for key, value := range requestOptions.Headers() {
 			request.Header.Add(key, value)
 		}
 	}
@@ -205,17 +205,17 @@ func (p *ProxyHttpRunner) PostJson(requestData IJsonRequestData, cookieJar ...*h
 	request.Header.Add("Content-Type", "application/json")
 
 	if len(cookieJar) > 0 {
-		if err := integrateCookies(requestData, request, cookieJar); err != nil {
+		if err := integrateCookies(requestOptions, request, cookieJar); err != nil {
 			return nil, err
 		}
 	}
 
-	return request.Post(requestData.Url())
+	return request.Post(requestOptions.Url())
 }
 
-func (p *ProxyHttpRunner) PutJson(requestData IJsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
-	if requestData.IsFollowRedirectOptionSet() {
-		if !requestData.FollowRedirectOption() {
+func (p *ProxyHttpRunner) PutJson(requestOptions IJsonRequestOptions, cookieJar ...*http.Cookie) (*resty.Response, error) {
+	if requestOptions.IsFollowRedirectOptionSet() {
+		if !requestOptions.FollowRedirectOption() {
 			p.client.SetRedirectPolicy(resty.RedirectPolicyFunc(func(req *http.Request, via []*http.Request) error { // disable redirect
 				return http.ErrUseLastResponse
 			}))
@@ -226,21 +226,21 @@ func (p *ProxyHttpRunner) PutJson(requestData IJsonRequestData, cookieJar ...*ht
 		}))
 	}
 
-	if requestData.IsRetryOptionSet() {
-		p.client.SetRetryCount(requestData.RetryOption())
+	if requestOptions.IsRetryOptionSet() {
+		p.client.SetRetryCount(requestOptions.RetryOption())
 	}
-	if requestData.IsTimeoutOptionSet() {
-		p.client.SetTimeout(requestData.TimeoutOption())
+	if requestOptions.IsTimeoutOptionSet() {
+		p.client.SetTimeout(requestOptions.TimeoutOption())
 	}
 
 	request := p.client.R()
 
-	if requestData.IsValueSet() {
-		request.SetBody(requestData.Value())
+	if requestOptions.IsValueSet() {
+		request.SetBody(requestOptions.Value())
 	}
 
-	if requestData.IsHeadersSet() {
-		for key, value := range requestData.Headers() {
+	if requestOptions.IsHeadersSet() {
+		for key, value := range requestOptions.Headers() {
 			request.Header.Add(key, value)
 		}
 	}
@@ -248,38 +248,44 @@ func (p *ProxyHttpRunner) PutJson(requestData IJsonRequestData, cookieJar ...*ht
 	request.Header.Add("Content-Type", "application/json")
 
 	if len(cookieJar) > 0 {
-		if err := integrateCookies(requestData, request, cookieJar); err != nil {
+		if err := integrateCookies(requestOptions, request, cookieJar); err != nil {
 			return nil, err
 		}
 	}
 
-	return request.Put(requestData.Url())
+	return request.Put(requestOptions.Url())
 }
 
-func (p *ProxyHttpRunner) PostForm(requestData IFormRequestData, cookieJar ...*http.Cookie) (*resty.Response, error) {
-	if requestData.IsFollowRedirectOptionSet() {
-		if !requestData.FollowRedirectOption() {
+func (p *ProxyHttpRunner) PostForm(requestOptions IFormRequestOptions, cookieJar ...*http.Cookie) (*resty.Response, error) {
+	if requestOptions.IsFollowRedirectOptionSet() {
+		if !requestOptions.FollowRedirectOption() {
 			p.client.SetRedirectPolicy(resty.RedirectPolicyFunc(func(req *http.Request, via []*http.Request) error { // disable redirect
 				return http.ErrUseLastResponse
 			}))
 		}
 	}
 
-	if requestData.IsRetryOptionSet() {
-		p.client.SetRetryCount(requestData.RetryOption())
+	if requestOptions.IsRetryOptionSet() {
+		p.client.SetRetryCount(requestOptions.RetryOption())
 	}
-	if requestData.IsTimeoutOptionSet() {
-		p.client.SetTimeout(requestData.TimeoutOption())
+	if requestOptions.IsTimeoutOptionSet() {
+		p.client.SetTimeout(requestOptions.TimeoutOption())
 	}
 
 	request := p.client.R()
 
-	if requestData.IsValuesSet() {
-		request.SetFormData(requestData.Values())
+	if requestOptions.IsValuesSet() {
+		request.SetFormData(requestOptions.Values())
 	}
 
-	if requestData.IsHeadersSet() {
-		for key, value := range requestData.Headers() {
+	if requestOptions.IsFilesSet() {
+		for key, value := range requestOptions.Files() {
+			request.SetFileReader(key, value.fileName, value.reader)
+		}
+	}
+
+	if requestOptions.IsHeadersSet() {
+		for key, value := range requestOptions.Headers() {
 			request.Header.Add(key, value)
 		}
 	}
@@ -287,10 +293,10 @@ func (p *ProxyHttpRunner) PostForm(requestData IFormRequestData, cookieJar ...*h
 	request.Header.Add("Content-Type", "x-www-form-urlencoded")
 
 	if len(cookieJar) > 0 {
-		if err := integrateCookies(requestData, request, cookieJar); err != nil {
+		if err := integrateCookies(requestOptions, request, cookieJar); err != nil {
 			return nil, err
 		}
 	}
 
-	return request.Post(requestData.Url())
+	return request.Post(requestOptions.Url())
 }

@@ -1,6 +1,7 @@
 package http_runner
 
 import (
+	"io"
 	"net/http"
 	"net/url"
 	"strings"
@@ -16,12 +17,12 @@ var DefaultHeaders = map[string]string{
 }
 
 type IHttpRunner interface {
-	GetJson(requestData IJsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
-	GetHtml(requestData IHtmlRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
-	GetFile(requestData IFileRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
-	PostJson(requestData IJsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
-	PutJson(requestData IJsonRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
-	PostForm(requestData IFormRequestData, cookieJar ...*http.Cookie) (*resty.Response, error)
+	GetJson(requestOptions IJsonRequestOptions, cookieJar ...*http.Cookie) (*resty.Response, error)
+	GetHtml(requestOptions IHtmlRequestOptions, cookieJar ...*http.Cookie) (*resty.Response, error)
+	GetFile(requestOptions IFileRequestOptions, cookieJar ...*http.Cookie) (*resty.Response, error)
+	PostJson(requestOptions IJsonRequestOptions, cookieJar ...*http.Cookie) (*resty.Response, error)
+	PutJson(requestOptions IJsonRequestOptions, cookieJar ...*http.Cookie) (*resty.Response, error)
+	PostForm(requestOptions IFormRequestOptions, cookieJar ...*http.Cookie) (*resty.Response, error)
 }
 
 type IBaseRequest interface {
@@ -46,7 +47,7 @@ type IBaseRequest interface {
 
 //
 
-type IJsonRequestData interface {
+type IJsonRequestOptions interface {
 	IBaseRequest
 
 	IsValueSet() bool
@@ -54,7 +55,7 @@ type IJsonRequestData interface {
 	Value() []byte
 }
 
-type JsonRequestData struct {
+type JsonRequestOptions struct {
 	url            string
 	value          *[]byte
 	headers        *map[string]string
@@ -63,67 +64,67 @@ type JsonRequestData struct {
 	followRedirect *bool
 }
 
-func (j *JsonRequestData) Url() string {
+func (j *JsonRequestOptions) Url() string {
 	return j.url
 }
 
-func (j *JsonRequestData) IsHeadersSet() bool {
+func (j *JsonRequestOptions) IsHeadersSet() bool {
 	return j.headers != nil
 }
-func (j *JsonRequestData) SetHeaders(headers map[string]string) {
+func (j *JsonRequestOptions) SetHeaders(headers map[string]string) {
 	j.headers = &headers
 }
-func (j *JsonRequestData) Headers() map[string]string {
+func (j *JsonRequestOptions) Headers() map[string]string {
 	return *j.headers
 }
 
-func (j *JsonRequestData) IsValueSet() bool {
+func (j *JsonRequestOptions) IsValueSet() bool {
 	return j.value != nil
 }
-func (j *JsonRequestData) SetValue(bytes []byte) {
+func (j *JsonRequestOptions) SetValue(bytes []byte) {
 	j.value = &bytes
 }
-func (j *JsonRequestData) Value() []byte {
+func (j *JsonRequestOptions) Value() []byte {
 	return *j.value
 }
 
-func (j *JsonRequestData) IsRetryOptionSet() bool {
+func (j *JsonRequestOptions) IsRetryOptionSet() bool {
 	return j.retryCount != nil
 }
-func (j *JsonRequestData) SetRetryOption(count int) {
+func (j *JsonRequestOptions) SetRetryOption(count int) {
 	j.retryCount = &count
 }
-func (j *JsonRequestData) RetryOption() int {
+func (j *JsonRequestOptions) RetryOption() int {
 	return *j.retryCount
 }
 
-func (j *JsonRequestData) IsTimeoutOptionSet() bool {
+func (j *JsonRequestOptions) IsTimeoutOptionSet() bool {
 	return j.timeout != nil
 }
-func (j *JsonRequestData) SetTimeoutOption(timeout time.Duration) {
+func (j *JsonRequestOptions) SetTimeoutOption(timeout time.Duration) {
 	j.timeout = &timeout
 }
-func (j *JsonRequestData) TimeoutOption() time.Duration {
+func (j *JsonRequestOptions) TimeoutOption() time.Duration {
 	return *j.timeout
 }
 
-func (j *JsonRequestData) IsFollowRedirectOptionSet() bool {
+func (j *JsonRequestOptions) IsFollowRedirectOptionSet() bool {
 	return j.followRedirect != nil
 }
-func (j *JsonRequestData) SetFollowRedirectOption(follow bool) {
+func (j *JsonRequestOptions) SetFollowRedirectOption(follow bool) {
 	j.followRedirect = &follow
 }
-func (j *JsonRequestData) FollowRedirectOption() bool {
+func (j *JsonRequestOptions) FollowRedirectOption() bool {
 	return *j.followRedirect
 }
 
-func NewJsonRequestData(url string) IJsonRequestData {
-	return &JsonRequestData{url: url}
+func NewJsonRequestOptions(url string) IJsonRequestOptions {
+	return &JsonRequestOptions{url: url}
 }
 
 //
 
-type IHtmlRequestData interface {
+type IHtmlRequestOptions interface {
 	IBaseRequest
 
 	IsValueSet() bool
@@ -131,7 +132,7 @@ type IHtmlRequestData interface {
 	Value() []byte
 }
 
-type HtmlRequestData struct {
+type HtmlRequestOptions struct {
 	url            string
 	value          *[]byte
 	headers        *map[string]string
@@ -140,150 +141,170 @@ type HtmlRequestData struct {
 	followRedirect *bool
 }
 
-func (h *HtmlRequestData) Url() string {
+func (h *HtmlRequestOptions) Url() string {
 	return h.url
 }
 
-func (h *HtmlRequestData) IsHeadersSet() bool {
+func (h *HtmlRequestOptions) IsHeadersSet() bool {
 	return h.headers != nil
 }
-func (h *HtmlRequestData) SetHeaders(headers map[string]string) {
+func (h *HtmlRequestOptions) SetHeaders(headers map[string]string) {
 	h.headers = &headers
 }
-func (h *HtmlRequestData) Headers() map[string]string {
+func (h *HtmlRequestOptions) Headers() map[string]string {
 	return *h.headers
 }
 
-func (h *HtmlRequestData) IsValueSet() bool {
+func (h *HtmlRequestOptions) IsValueSet() bool {
 	return h.value != nil
 }
-func (h *HtmlRequestData) SetValue(bytes []byte) {
+func (h *HtmlRequestOptions) SetValue(bytes []byte) {
 	h.value = &bytes
 }
-func (h *HtmlRequestData) Value() []byte {
+func (h *HtmlRequestOptions) Value() []byte {
 	return *h.value
 }
 
-func (h *HtmlRequestData) IsRetryOptionSet() bool {
+func (h *HtmlRequestOptions) IsRetryOptionSet() bool {
 	return h.retryCount != nil
 }
-func (h *HtmlRequestData) SetRetryOption(count int) {
+func (h *HtmlRequestOptions) SetRetryOption(count int) {
 	h.retryCount = &count
 }
-func (h *HtmlRequestData) RetryOption() int {
+func (h *HtmlRequestOptions) RetryOption() int {
 	return *h.retryCount
 }
 
-func (h *HtmlRequestData) IsTimeoutOptionSet() bool {
+func (h *HtmlRequestOptions) IsTimeoutOptionSet() bool {
 	return h.timeout != nil
 }
-func (h *HtmlRequestData) SetTimeoutOption(timeout time.Duration) {
+func (h *HtmlRequestOptions) SetTimeoutOption(timeout time.Duration) {
 	h.timeout = &timeout
 }
-func (h *HtmlRequestData) TimeoutOption() time.Duration {
+func (h *HtmlRequestOptions) TimeoutOption() time.Duration {
 	return *h.timeout
 }
 
-func (h *HtmlRequestData) IsFollowRedirectOptionSet() bool {
+func (h *HtmlRequestOptions) IsFollowRedirectOptionSet() bool {
 	return h.followRedirect != nil
 }
-func (h *HtmlRequestData) SetFollowRedirectOption(follow bool) {
+func (h *HtmlRequestOptions) SetFollowRedirectOption(follow bool) {
 	h.followRedirect = &follow
 }
-func (h *HtmlRequestData) FollowRedirectOption() bool {
+func (h *HtmlRequestOptions) FollowRedirectOption() bool {
 	return *h.followRedirect
 }
 
-func NewHtmlRequestData(url string) IHtmlRequestData {
-	return &HtmlRequestData{url: url}
+func NewHtmlRequestOptions(url string) IHtmlRequestOptions {
+	return &HtmlRequestOptions{url: url}
 }
 
 //
 
-type IFormRequestData interface {
+type FileInfo struct {
+	fileName string
+	reader   io.Reader
+}
+
+type IFormRequestOptions interface {
 	IBaseRequest
 
 	IsValuesSet() bool
 	SetValues(values map[string]string)
 	Values() map[string]string
+
+	IsFilesSet() bool
+	SetFiles(files map[string]FileInfo)
+	Files() map[string]FileInfo
 }
 
-type FormRequestData struct {
+type FormRequestOptions struct {
 	url            string
 	values         *map[string]string
+	files          *map[string]FileInfo
 	headers        *map[string]string
 	retryCount     *int
 	timeout        *time.Duration
 	followRedirect *bool
 }
 
-func (f *FormRequestData) Url() string {
+func (f *FormRequestOptions) Url() string {
 	return f.url
 }
 
-func (f *FormRequestData) IsHeadersSet() bool {
+func (f *FormRequestOptions) IsHeadersSet() bool {
 	return f.headers != nil
 }
-func (f *FormRequestData) SetHeaders(headers map[string]string) {
+func (f *FormRequestOptions) SetHeaders(headers map[string]string) {
 	f.headers = &headers
 }
-func (f *FormRequestData) Headers() map[string]string {
+func (f *FormRequestOptions) Headers() map[string]string {
 	return *f.headers
 }
 
-func (f *FormRequestData) IsValuesSet() bool {
+func (f *FormRequestOptions) IsValuesSet() bool {
 	return f.values != nil
 }
-func (f *FormRequestData) SetValues(values map[string]string) {
+func (f *FormRequestOptions) SetValues(values map[string]string) {
 	f.values = &values
 }
-func (f *FormRequestData) Values() map[string]string {
+func (f *FormRequestOptions) Values() map[string]string {
 	return *f.values
 }
 
-func (f *FormRequestData) IsRetryOptionSet() bool {
+func (f *FormRequestOptions) IsFilesSet() bool {
+	return f.files != nil
+}
+func (f *FormRequestOptions) SetFiles(files map[string]FileInfo) {
+	f.files = &files
+}
+func (f *FormRequestOptions) Files() map[string]FileInfo {
+	return *f.files
+}
+
+func (f *FormRequestOptions) IsRetryOptionSet() bool {
 	return f.retryCount != nil
 }
-func (f *FormRequestData) SetRetryOption(count int) {
+func (f *FormRequestOptions) SetRetryOption(count int) {
 	f.retryCount = &count
 }
-func (f *FormRequestData) RetryOption() int {
+func (f *FormRequestOptions) RetryOption() int {
 	return *f.retryCount
 }
 
-func (f *FormRequestData) IsTimeoutOptionSet() bool {
+func (f *FormRequestOptions) IsTimeoutOptionSet() bool {
 	return f.timeout != nil
 }
-func (f *FormRequestData) SetTimeoutOption(timeout time.Duration) {
+func (f *FormRequestOptions) SetTimeoutOption(timeout time.Duration) {
 	f.timeout = &timeout
 }
-func (f *FormRequestData) TimeoutOption() time.Duration {
+func (f *FormRequestOptions) TimeoutOption() time.Duration {
 	return *f.timeout
 }
 
-func (f *FormRequestData) IsFollowRedirectOptionSet() bool {
+func (f *FormRequestOptions) IsFollowRedirectOptionSet() bool {
 	return f.followRedirect != nil
 }
-func (f *FormRequestData) SetFollowRedirectOption(follow bool) {
+func (f *FormRequestOptions) SetFollowRedirectOption(follow bool) {
 	f.followRedirect = &follow
 }
-func (f *FormRequestData) FollowRedirectOption() bool {
+func (f *FormRequestOptions) FollowRedirectOption() bool {
 	return *f.followRedirect
 }
 
-func NewFormRequestData(url string) IFormRequestData {
-	return &FormRequestData{url: url}
+func NewFormRequestOptions(url string) IFormRequestOptions {
+	return &FormRequestOptions{url: url}
 }
 
 //
 
-type IFileRequestData interface {
+type IFileRequestOptions interface {
 	IBaseRequest
 
 	FilePath() string
 }
 
-type FileRequestData struct {
+type FileRequestOptions struct {
 	url            string
 	filePath       string
 	headers        *map[string]string
@@ -292,60 +313,60 @@ type FileRequestData struct {
 	followRedirect *bool
 }
 
-func (j *FileRequestData) Url() string {
+func (j *FileRequestOptions) Url() string {
 	return j.url
 }
 
-func (j *FileRequestData) FilePath() string {
+func (j *FileRequestOptions) FilePath() string {
 	return j.filePath
 }
 
-func (j *FileRequestData) IsHeadersSet() bool {
+func (j *FileRequestOptions) IsHeadersSet() bool {
 	return j.headers != nil
 }
-func (j *FileRequestData) SetHeaders(headers map[string]string) {
+func (j *FileRequestOptions) SetHeaders(headers map[string]string) {
 	j.headers = &headers
 }
-func (j *FileRequestData) Headers() map[string]string {
+func (j *FileRequestOptions) Headers() map[string]string {
 	return *j.headers
 }
 
-func (j *FileRequestData) IsRetryOptionSet() bool {
+func (j *FileRequestOptions) IsRetryOptionSet() bool {
 	return j.retryCount != nil
 }
-func (j *FileRequestData) SetRetryOption(count int) {
+func (j *FileRequestOptions) SetRetryOption(count int) {
 	j.retryCount = &count
 }
-func (j *FileRequestData) RetryOption() int {
+func (j *FileRequestOptions) RetryOption() int {
 	return *j.retryCount
 }
 
-func (j *FileRequestData) IsTimeoutOptionSet() bool {
+func (j *FileRequestOptions) IsTimeoutOptionSet() bool {
 	return j.timeout != nil
 }
-func (j *FileRequestData) SetTimeoutOption(timeout time.Duration) {
+func (j *FileRequestOptions) SetTimeoutOption(timeout time.Duration) {
 	j.timeout = &timeout
 }
-func (j *FileRequestData) TimeoutOption() time.Duration {
+func (j *FileRequestOptions) TimeoutOption() time.Duration {
 	return *j.timeout
 }
 
-func (j *FileRequestData) IsFollowRedirectOptionSet() bool {
+func (j *FileRequestOptions) IsFollowRedirectOptionSet() bool {
 	return j.followRedirect != nil
 }
-func (j *FileRequestData) SetFollowRedirectOption(follow bool) {
+func (j *FileRequestOptions) SetFollowRedirectOption(follow bool) {
 	j.followRedirect = &follow
 }
-func (j *FileRequestData) FollowRedirectOption() bool {
+func (j *FileRequestOptions) FollowRedirectOption() bool {
 	return *j.followRedirect
 }
 
-func NewFileRequestData(url, filePath string) IFileRequestData {
-	return &FileRequestData{url: url, filePath: filePath}
+func NewFileRequestOptions(url, filePath string) IFileRequestOptions {
+	return &FileRequestOptions{url: url, filePath: filePath}
 }
 
-func integrateCookies(requestData IBaseRequest, request *resty.Request, cookieJar []*http.Cookie) error {
-	parsedUrl, err := url.Parse(requestData.Url())
+func integrateCookies(requestOptions IBaseRequest, request *resty.Request, cookieJar []*http.Cookie) error {
+	parsedUrl, err := url.Parse(requestOptions.Url())
 	if err != nil {
 		return err
 	}
