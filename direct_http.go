@@ -2,6 +2,7 @@ package http_runner
 
 import (
 	"context"
+	NetworkRunner "github.com/Tanreon/go-network-runner"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -67,6 +68,15 @@ func NewAdvancedDirectHttpRunner(dialer *rule.Proxy, retryCount int, timeout tim
 
 func NewDirectHttpRunner(dialer *rule.Proxy) (IHttpRunner, error) {
 	return NewAdvancedDirectHttpRunner(dialer, 2, time.Second*15, DefaultHeaders)
+}
+
+func NewDefaultDirectHttpRunner() (IHttpRunner, error) {
+	directDialer, err := NetworkRunner.NewDirectDialer()
+	if err != nil {
+		return nil, err
+	}
+
+	return NewDirectHttpRunner(directDialer)
 }
 
 func (d *DirectHttpRunner) GetJson(requestOptions IJsonRequestOptions, cookieJar ...*http.Cookie) (*resty.Response, error) {
