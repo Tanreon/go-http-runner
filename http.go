@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -210,7 +211,7 @@ type FileInfo struct {
 
 func BuildFileInfo(file *os.File) FileInfo {
 	return FileInfo{
-		fileName: file.Name(),
+		fileName: filepath.Base(file.Name()),
 		reader:   bufio.NewReader(file),
 	}
 }
