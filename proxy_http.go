@@ -54,7 +54,7 @@ func NewAdvancedProxyHttpRunner(dialer *rule.Proxy, retryCount int, timeout time
 	//client.Header.Add("cache-control", "max-age=0")
 	//client.Header.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36")
 	for key, value := range headers {
-		client.Header.Add(key, value)
+		client.Header.Set(key, value)
 	}
 	// CREATE A RESTY CLIENT WITH PROXY
 
@@ -86,14 +86,17 @@ func (p *ProxyHttpRunner) GetJson(requestOptions IJsonRequestOptions, cookieJar 
 	}
 
 	request := p.client.R()
+	request.Header = p.client.Header.Clone()
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Add(key, value)
+			request.Header.Set(key, value)
 		}
 	}
 
-	request.Header.Add("Content-Type", "application/json")
+	if len(request.Header.Get("Content-Type")) <= 0 {
+		request.Header.Set("Content-Type", "application/json")
+	}
 
 	if len(cookieJar) > 0 {
 		if err := integrateCookies(requestOptions, request, cookieJar); err != nil {
@@ -121,10 +124,11 @@ func (p *ProxyHttpRunner) GetHtml(requestOptions IHtmlRequestOptions, cookieJar 
 	}
 
 	request := p.client.R()
+	request.Header = p.client.Header.Clone()
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Add(key, value)
+			request.Header.Set(key, value)
 		}
 	}
 
@@ -154,10 +158,11 @@ func (p *ProxyHttpRunner) GetFile(requestOptions IFileRequestOptions, cookieJar 
 	}
 
 	request := p.client.R().SetOutput(requestOptions.FilePath())
+	request.Header = p.client.Header.Clone()
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Add(key, value)
+			request.Header.Set(key, value)
 		}
 	}
 
@@ -191,6 +196,7 @@ func (p *ProxyHttpRunner) PostJson(requestOptions IJsonRequestOptions, cookieJar
 	}
 
 	request := p.client.R()
+	request.Header = p.client.Header.Clone()
 
 	if requestOptions.IsValueSet() {
 		request.SetBody(requestOptions.Value())
@@ -198,11 +204,13 @@ func (p *ProxyHttpRunner) PostJson(requestOptions IJsonRequestOptions, cookieJar
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Add(key, value)
+			request.Header.Set(key, value)
 		}
 	}
 
-	request.Header.Add("Content-Type", "application/json")
+	if len(request.Header.Get("Content-Type")) <= 0 {
+		request.Header.Set("Content-Type", "application/json")
+	}
 
 	if len(cookieJar) > 0 {
 		if err := integrateCookies(requestOptions, request, cookieJar); err != nil {
@@ -234,6 +242,7 @@ func (p *ProxyHttpRunner) PutJson(requestOptions IJsonRequestOptions, cookieJar 
 	}
 
 	request := p.client.R()
+	request.Header = p.client.Header.Clone()
 
 	if requestOptions.IsValueSet() {
 		request.SetBody(requestOptions.Value())
@@ -241,11 +250,13 @@ func (p *ProxyHttpRunner) PutJson(requestOptions IJsonRequestOptions, cookieJar 
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Add(key, value)
+			request.Header.Set(key, value)
 		}
 	}
 
-	request.Header.Add("Content-Type", "application/json")
+	if len(request.Header.Get("Content-Type")) <= 0 {
+		request.Header.Set("Content-Type", "application/json")
+	}
 
 	if len(cookieJar) > 0 {
 		if err := integrateCookies(requestOptions, request, cookieJar); err != nil {
@@ -273,6 +284,7 @@ func (p *ProxyHttpRunner) PostForm(requestOptions IFormRequestOptions, cookieJar
 	}
 
 	request := p.client.R()
+	request.Header = p.client.Header.Clone()
 
 	if requestOptions.IsValuesSet() {
 		request.SetFormData(requestOptions.Values())
@@ -286,11 +298,13 @@ func (p *ProxyHttpRunner) PostForm(requestOptions IFormRequestOptions, cookieJar
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Add(key, value)
+			request.Header.Set(key, value)
 		}
 	}
 
-	request.Header.Add("Content-Type", "x-www-form-urlencoded")
+	if len(request.Header.Get("Content-Type")) <= 0 {
+		request.Header.Set("Content-Type", "x-www-form-urlencoded")
+	}
 
 	if len(cookieJar) > 0 {
 		if err := integrateCookies(requestOptions, request, cookieJar); err != nil {
