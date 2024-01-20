@@ -3,7 +3,7 @@ package http_runner
 import (
 	"context"
 	NetworkRunner "github.com/Tanreon/go-network-runner"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"time"
@@ -37,7 +37,7 @@ func NewAdvancedDirectHttpRunner(dialer *rule.Proxy, retryCount int, timeout tim
 
 	if !log.IsLevelEnabled(log.TraceLevel) {
 		restyLogger := log.New()
-		restyLogger.SetOutput(ioutil.Discard)
+		restyLogger.SetOutput(io.Discard)
 
 		client.SetLogger(restyLogger)
 	}
@@ -64,7 +64,6 @@ func NewAdvancedDirectHttpRunner(dialer *rule.Proxy, retryCount int, timeout tim
 		defHeaders: headers,
 		client:     client,
 	}
-
 	// CREATE A RESTY CLIENT WITHOUT PROXY
 
 	return runner, nil
