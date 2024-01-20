@@ -14,7 +14,8 @@ import (
 )
 
 type ProxyHttpRunner struct {
-	client *resty.Client
+	defHeaders map[string]string
+	client     *resty.Client
 }
 
 func NewAdvancedProxyHttpRunner(dialer *rule.Proxy, retryCount int, timeout time.Duration, headers map[string]string) (IHttpRunner, error) {
@@ -53,12 +54,14 @@ func NewAdvancedProxyHttpRunner(dialer *rule.Proxy, retryCount int, timeout time
 	//client.Header.Add("accept-language", "en-US,en;q=0.9")
 	//client.Header.Add("cache-control", "max-age=0")
 	//client.Header.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.113 Safari/537.36")
-	for key, value := range headers {
-		client.Header.Set(key, value)
+
+	runner := &ProxyHttpRunner{
+		defHeaders: headers,
+		client:     client,
 	}
 	// CREATE A RESTY CLIENT WITH PROXY
 
-	return &ProxyHttpRunner{client}, nil
+	return runner, nil
 }
 
 func NewProxyHttpRunner(dialer *rule.Proxy) (IHttpRunner, error) {
@@ -86,7 +89,12 @@ func (p *ProxyHttpRunner) GetJson(requestOptions IJsonRequestOptions, cookieJar 
 	}
 
 	request := p.client.R()
-	request.Header = p.client.Header.Clone()
+
+	if len(p.defHeaders) > 0 {
+		for key, value := range p.defHeaders {
+			request.Header.Set(key, value)
+		}
+	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
@@ -124,7 +132,12 @@ func (p *ProxyHttpRunner) GetHtml(requestOptions IHtmlRequestOptions, cookieJar 
 	}
 
 	request := p.client.R()
-	request.Header = p.client.Header.Clone()
+
+	if len(p.defHeaders) > 0 {
+		for key, value := range p.defHeaders {
+			request.Header.Set(key, value)
+		}
+	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
@@ -158,7 +171,12 @@ func (p *ProxyHttpRunner) GetFile(requestOptions IFileRequestOptions, cookieJar 
 	}
 
 	request := p.client.R().SetOutput(requestOptions.FilePath())
-	request.Header = p.client.Header.Clone()
+
+	if len(p.defHeaders) > 0 {
+		for key, value := range p.defHeaders {
+			request.Header.Set(key, value)
+		}
+	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
@@ -196,16 +214,21 @@ func (p *ProxyHttpRunner) PostJson(requestOptions IJsonRequestOptions, cookieJar
 	}
 
 	request := p.client.R()
-	request.Header = p.client.Header.Clone()
 
-	if requestOptions.IsValueSet() {
-		request.SetBody(requestOptions.Value())
+	if len(p.defHeaders) > 0 {
+		for key, value := range p.defHeaders {
+			request.Header.Set(key, value)
+		}
 	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
 			request.Header.Set(key, value)
 		}
+	}
+
+	if requestOptions.IsValueSet() {
+		request.SetBody(requestOptions.Value())
 	}
 
 	if len(request.Header.Get("Content-Type")) <= 0 {
@@ -242,16 +265,21 @@ func (p *ProxyHttpRunner) PutJson(requestOptions IJsonRequestOptions, cookieJar 
 	}
 
 	request := p.client.R()
-	request.Header = p.client.Header.Clone()
 
-	if requestOptions.IsValueSet() {
-		request.SetBody(requestOptions.Value())
+	if len(p.defHeaders) > 0 {
+		for key, value := range p.defHeaders {
+			request.Header.Set(key, value)
+		}
 	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
 			request.Header.Set(key, value)
 		}
+	}
+
+	if requestOptions.IsValueSet() {
+		request.SetBody(requestOptions.Value())
 	}
 
 	if len(request.Header.Get("Content-Type")) <= 0 {
@@ -284,16 +312,21 @@ func (p *ProxyHttpRunner) PostForm(requestOptions IFormRequestOptions, cookieJar
 	}
 
 	request := p.client.R()
-	request.Header = p.client.Header.Clone()
 
-	if requestOptions.IsValuesSet() {
-		request.SetFormData(requestOptions.Values())
+	if len(p.defHeaders) > 0 {
+		for key, value := range p.defHeaders {
+			request.Header.Set(key, value)
+		}
 	}
 
 	if requestOptions.IsFilesSet() {
 		for key, value := range requestOptions.Files() {
 			request.SetFileReader(key, value.fileName, value.reader)
 		}
+	}
+
+	if requestOptions.IsValuesSet() {
+		request.SetFormData(requestOptions.Values())
 	}
 
 	if requestOptions.IsHeadersSet() {
