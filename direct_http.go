@@ -106,13 +106,13 @@ func (d *DirectHttpRunner) GetJson(requestOptions IJsonRequestOptions, cookieJar
 
 	if len(d.defHeaders) > 0 {
 		for key, value := range d.defHeaders {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
@@ -149,13 +149,13 @@ func (d *DirectHttpRunner) GetHtml(requestOptions IHtmlRequestOptions, cookieJar
 
 	if len(d.defHeaders) > 0 {
 		for key, value := range d.defHeaders {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
@@ -188,13 +188,13 @@ func (d *DirectHttpRunner) GetFile(requestOptions IFileRequestOptions, cookieJar
 
 	if len(d.defHeaders) > 0 {
 		for key, value := range d.defHeaders {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
@@ -231,13 +231,13 @@ func (d *DirectHttpRunner) PostJson(requestOptions IJsonRequestOptions, cookieJa
 
 	if len(d.defHeaders) > 0 {
 		for key, value := range d.defHeaders {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
@@ -282,13 +282,13 @@ func (d *DirectHttpRunner) PutJson(requestOptions IJsonRequestOptions, cookieJar
 
 	if len(d.defHeaders) > 0 {
 		for key, value := range d.defHeaders {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
@@ -329,7 +329,7 @@ func (d *DirectHttpRunner) PostForm(requestOptions IFormRequestOptions, cookieJa
 
 	if len(d.defHeaders) > 0 {
 		for key, value := range d.defHeaders {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
@@ -345,7 +345,7 @@ func (d *DirectHttpRunner) PostForm(requestOptions IFormRequestOptions, cookieJa
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 

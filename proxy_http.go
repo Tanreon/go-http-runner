@@ -92,13 +92,13 @@ func (p *ProxyHttpRunner) GetJson(requestOptions IJsonRequestOptions, cookieJar 
 
 	if len(p.defHeaders) > 0 {
 		for key, value := range p.defHeaders {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
@@ -135,13 +135,13 @@ func (p *ProxyHttpRunner) GetHtml(requestOptions IHtmlRequestOptions, cookieJar 
 
 	if len(p.defHeaders) > 0 {
 		for key, value := range p.defHeaders {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
@@ -174,13 +174,13 @@ func (p *ProxyHttpRunner) GetFile(requestOptions IFileRequestOptions, cookieJar 
 
 	if len(p.defHeaders) > 0 {
 		for key, value := range p.defHeaders {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
@@ -217,13 +217,13 @@ func (p *ProxyHttpRunner) PostJson(requestOptions IJsonRequestOptions, cookieJar
 
 	if len(p.defHeaders) > 0 {
 		for key, value := range p.defHeaders {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
@@ -268,13 +268,13 @@ func (p *ProxyHttpRunner) PutJson(requestOptions IJsonRequestOptions, cookieJar 
 
 	if len(p.defHeaders) > 0 {
 		for key, value := range p.defHeaders {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
@@ -315,7 +315,7 @@ func (p *ProxyHttpRunner) PostForm(requestOptions IFormRequestOptions, cookieJar
 
 	if len(p.defHeaders) > 0 {
 		for key, value := range p.defHeaders {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
@@ -331,7 +331,7 @@ func (p *ProxyHttpRunner) PostForm(requestOptions IFormRequestOptions, cookieJar
 
 	if requestOptions.IsHeadersSet() {
 		for key, value := range requestOptions.Headers() {
-			request.Header.Set(key, value)
+			request.SetHeaderVerbatim(key, value)
 		}
 	}
 
